@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+/*import 'package:flutter/material.dart';
 
 void main() {
   runApp(const MyApp());
@@ -31,6 +31,7 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+
 
 class MyHomePage extends StatelessWidget {
   final String title;
@@ -128,6 +129,180 @@ class MyHomePage extends StatelessWidget {
 
             const SizedBox(height: 40),
           ],
+        ),
+      ),
+    );
+  }
+}
+*/
+
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Cinema Collection',
+      debugShowCheckedModeBanner: false,
+      home: const WelcomeScreen(),
+    );
+  }
+}
+
+class WelcomeScreen extends StatelessWidget {
+  const WelcomeScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text(
+          'Cinema Collection',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        backgroundColor: const Color.fromARGB(255, 197, 153, 86),
+        foregroundColor: Colors.white,
+        centerTitle: true,
+      ),
+      backgroundColor: const Color.fromARGB(255, 0, 0, 0),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[
+              // Botones en la parte superior
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color.fromARGB(255, 66, 40, 2),
+                        foregroundColor: Colors.white,
+                        minimumSize: const Size(0, 50),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                      ),
+                      icon: const Icon(Icons.home),
+                      label: const Text('Ingresar'),
+                      onPressed: () {
+                        // Navegar a pantalla de login
+                      },
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color.fromARGB(255, 158, 109, 50),
+                        foregroundColor: Colors.white,
+                        minimumSize: const Size(0, 50),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                      ),
+                      icon: const Icon(Icons.add),
+                      label: const Text('Regístrate'),
+                      onPressed: () {
+                        // Navegar a pantalla de registro
+                      },
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 30),
+              // Logo
+              Image.asset(
+                'assets/images/logo.png',
+                width: 180,
+                height: 180,
+              ),
+              const SizedBox(height: 20),
+              const Text(
+                '¡Bienvenido!',
+                style: TextStyle(
+                  fontSize: 32,
+                  fontWeight: FontWeight.bold,
+                  color: Color.fromARGB(255, 219, 157, 23),
+                ),
+              ),
+              const SizedBox(height: 20),
+              // Imagen principal
+              ClipRRect(
+                borderRadius: BorderRadius.circular(16),
+                child: Image.asset(
+                  'assets/images/spotlight.jpg',
+                  width: double.infinity,
+                  height: 200,
+                  fit: BoxFit.cover,
+                ),
+              ),
+              const SizedBox(height: 20),
+
+                            const SizedBox(height: 20),
+              const Text(
+                'Populares',
+                style: TextStyle(
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                  color: Color.fromARGB(255, 168, 120, 17),
+                ),
+              ),
+              // Fila de 3 imágenes adicionales
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 4),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(12),
+                        child: Image.asset(
+                          'assets/images/movie1.png',
+                          height: 100,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 4),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(12),
+                        child: Image.asset(
+                          'assets/images/movie2.png',
+                          height: 100,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 4),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(12),
+                        child: Image.asset(
+                          'assets/images/movie3.png',
+                          height: 100,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );

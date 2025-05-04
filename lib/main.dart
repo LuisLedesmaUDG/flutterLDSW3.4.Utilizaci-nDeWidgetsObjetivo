@@ -134,7 +134,6 @@ class MyHomePage extends StatelessWidget {
     );
   }
 }
-*/
 
 import 'package:flutter/material.dart';
 
@@ -303,6 +302,200 @@ class WelcomeScreen extends StatelessWidget {
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+*/
+import 'dart:convert';
+import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+
+void main() {
+  runApp(PokeApp());
+}
+
+class PokeApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'PokeAPI App',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.blue,
+            foregroundColor: Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+            textStyle: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          ),
+        ),
+      ),
+      home: PokemonPage(),
+    );
+  }
+}
+
+class PokemonPage extends StatefulWidget {
+  @override
+  _PokemonPageState createState() => _PokemonPageState();
+}
+
+class _PokemonPageState extends State<PokemonPage> {
+  String name = '';
+  String imageUrl = '';
+  List<Map<String, dynamic>> stats = [];
+  List<String> evolutions = [];
+
+  bool isLoading = false;
+  String error = '';
+
+  final _controller = TextEditingController();
+
+  Future<void> fetchPokemon(String pokemonName) async {
+    setState(() {
+      isLoading = true;
+      error = '';
+      stats = [];
+      evolutions = [];
+      imageUrl = '';
+      name = '';
+    });
+
+    final url = Uri.parse('https://pokeapi.co/api/v2/pokemon/$pokemonName');
+
+    try {
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+
+        setState(() {
+          name = data['name'];
+          imageUrl = data['sprites']['front_default'];
+          stats = (data['stats'] as List)
+              .map((stat) => {
+                    'name': stat['stat']['name'],
+                    'value': stat['base_stat']
+                  })
+              .toList();
+        });
+
+        final speciesUrl = data['species']['url'];
+        await fetchEvolutionChain(speciesUrl);
+      } else {
+        setState(() {
+          error = 'Pokémon no encontrado';
+        });
+      }
+    } catch (e) {
+      setState(() {
+        error = 'Error de conexión: $e';
+      });
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
+  Future<void> fetchEvolutionChain(String speciesUrl) async {
+    try {
+      final speciesRes = await http.get(Uri.parse(speciesUrl));
+      if (speciesRes.statusCode == 200) {
+        final speciesData = jsonDecode(speciesRes.body);
+        final evoUrl = speciesData['evolution_chain']['url'];
+
+        final evoRes = await http.get(Uri.parse(evoUrl));
+        if (evoRes.statusCode == 200) {
+          final evoData = jsonDecode(evoRes.body);
+          List<String> evoList = [];
+
+          void parseChain(dynamic chain) {
+            evoList.add(chain['species']['name']);
+            if (chain['evolves_to'] != null && chain['evolves_to'].isNotEmpty) {
+              parseChain(chain['evolves_to'][0]);
+            }
+          }
+
+          parseChain(evoData['chain']);
+          setState(() {
+            evolutions = evoList;
+          });
+        }
+      }
+    } catch (e) {
+      print('Error obteniendo evolución: $e');
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('¡Busca a tu pokemon!'),
+        centerTitle: true,
+      ),
+      body: SingleChildScrollView(
+        padding: EdgeInsets.all(16),
+        child: Column(
+          children: [
+            if (imageUrl.isNotEmpty)
+              Column(
+                children: [
+                  Image.network(imageUrl, height: 150),
+                  SizedBox(height: 10),
+                ],
+              ),
+            TextField(
+              controller: _controller,
+              decoration: InputDecoration(
+                labelText: 'Nombre del Pokémon',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            SizedBox(height: 10),
+            ElevatedButton.icon(
+              onPressed: () {
+                final input = _controller.text.trim().toLowerCase();
+                if (input.isNotEmpty) fetchPokemon(input);
+              },
+              icon: Icon(Icons.search),
+              label: Text('Buscar Pokémon'),
+            ),
+            SizedBox(height: 20),
+            if (isLoading) CircularProgressIndicator(),
+            if (error.isNotEmpty)
+              Text(error, style: TextStyle(color: Colors.red)),
+            if (name.isNotEmpty && stats.isNotEmpty)
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Nombre: $name',
+                      style: TextStyle(
+                          fontSize: 22, fontWeight: FontWeight.bold)),
+                  SizedBox(height: 20),
+                  Text('Estadísticas:',
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  ...stats.map((stat) => Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 2),
+                        child: Text('${stat['name']}: ${stat['value']}'),
+                      )),
+                  SizedBox(height: 20),
+                  if (evolutions.isNotEmpty) ...[
+                    Text('Cadena Evolutiva:',
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold)),
+                    Text(evolutions.join(' → '),
+                        style: TextStyle(fontSize: 16)),
+                  ],
+                ],
+              ),
+          ],
         ),
       ),
     );

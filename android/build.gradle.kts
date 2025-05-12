@@ -1,6 +1,10 @@
 buildscript {
+    repositories {
+        google()
+        mavenCentral()
+    }
     dependencies {
-        classpath("com.google.gms:google-services:4.4.1") // 👈 Firebase plugin
+        classpath("com.google.gms:google-services:4.4.1") // 👈 CORRECTO para .kts
     }
 }
 

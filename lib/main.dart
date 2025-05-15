@@ -1,4 +1,77 @@
-/*import 'package:flutter/material.dart';
+/*
+PI. Catálogo de películas
+Luis Carlos Ledesma Herrera
+Diseño de aplicaciones móviles
+Producto integrador
+15 mayo 2025
+*/
+
+import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
+import 'screens/welcome_screen.dart';
+import 'screens/login_screen.dart';
+import 'screens/register_screen.dart';
+import 'screens/catalog_screen.dart';
+import 'screens/admin_screen.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+  runApp(const PeliculasApp());
+}
+
+class PeliculasApp extends StatelessWidget {
+  const PeliculasApp({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Catálogo de Películas',
+      theme: ThemeData(
+        primarySwatch: Colors.deepPurple,
+      ),
+      home: const AuthWrapper(),
+      routes: {
+        '/login': (context) => const LoginScreen(),
+        '/register': (context) => const RegisterScreen(),
+        '/catalog': (context) => const CatalogScreen(),
+        '/admin': (context) => const AdminScreen(),
+      },
+    );
+  }
+}
+
+class AuthWrapper extends StatelessWidget {
+  const AuthWrapper({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<User?>(
+      stream: FirebaseAuth.instance.authStateChanges(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
+        } else if (snapshot.hasData) {
+          final user = snapshot.data!;
+          if (user.email == 'admin@admin.com') {
+            return const AdminScreen();
+          } else {
+            return const CatalogScreen();
+          }
+        } else {
+          return const WelcomeScreen();
+        }
+      },
+    );
+  }
+}
+
+/*
+import 'package:flutter/material.dart';
 
 void main() {
   runApp(const MyApp());
@@ -508,7 +581,7 @@ class _PokemonPageState extends State<PokemonPage> {
     );
   }
 }
-*/
+
 
 import 'dart:convert';
 import 'package:flutter/material.dart';
@@ -753,3 +826,4 @@ class _PokemonPageState extends State<PokemonPage> {
   }
 }
 
+*/
